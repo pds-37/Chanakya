@@ -1,8 +1,8 @@
 # 🚂 Chanakya : Real-Time Digital Twin for Railway Logistics with AI Optimization
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://railway-simulation.vercel.app)
-[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://railway-simulation.onrender.com)
-[![AI Engine](https://img.shields.io/badge/AI%20Engine-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://railway-ai-brain.onrender.com)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://chanakya-psi.vercel.app/)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)]()
+[![AI Engine](https://img.shields.io/badge/AI%20Engine-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)]()
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
 > An advanced **Digital Twin simulation** for railway networks — combining real-time synchronization, cloud-native microservices, and a **Reinforcement Learning (RL)** agent to optimize traffic flow and prevent collisions.
