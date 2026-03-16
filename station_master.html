@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Station Master Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="station_master.css">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">🚄 AI Railway Traffic Control</div>
+                <div class="project-info">
+                    <div style="font-weight: bold;">Ministry of Railways | SIH-GID 335</div>
+                    <div style="font-size: 12px; opacity: 0.7;">AI-Powered Train Traffic Optimization System</div>
+                </div>
+            </div>
+            <div class="status-section" id="header-status-section">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>AI System Offline</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-navigation">
+            <ul class="tab-list" id="tab-list">
+                <li><button class="tab-item active" data-tab="network">🗺️ Network View</button></li>
+                <li><button class="tab-item" data-tab="track-status">🚦 Track Status</button></li>
+                <li><button class="tab-item" data-tab="dashboard">📊 Dashboard</button></li>
+                <li><button class="tab-item" data-tab="analytics">📈 Analytics</button></li>
+                <li><button class="tab-item" data-tab="simulation">⚡ Simulation</button></li>
+                <li><button class="tab-item" data-tab="settings">⚙️ Settings</button></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <div class="tab-content active" id="network">
+            <div class="network-tab">
+                <!-- Network Controls -->
+                <div class="network-controls">
+                    <div class="section-title">🎮 Simulation Controls</div>
+                    <div class="control-group">
+                        <label class="input-label">Train Count</label>
+                        <input type="number" class="input-field" value="10" min="1" max="10" disabled>
+
+                        <label class="input-label">Simulation Speed</label>
+                        <select class="input-field">
+                            <option value="1">1x Real-time</option>
+                            <option value="5" selected>5x Speed</option>
+                            <option value="10">10x Speed</option>
+                        </select>
+
+                        <button class="btn btn-success" onclick="startSimulation()">▶️ Start Simulation</button>
+                        <button class="btn btn-warning" onclick="pauseSimulation()">⏸️ Pause</button>
+                        <button class="btn btn-danger" onclick="resetSimulation()">🔄 Reset</button>
+                    </div>
+
+                    <div class="section-title">👨‍✈️ Loco Pilot Updates</div>
+                    <div class="lp-update-container" id="loco-pilot-updates-list">
+                        <div class="lp-update-placeholder">No updates from pilots.</div>
+                    </div>
+                </div>
+
+                <!-- Main Network Visualization -->
+                <div class="network-main" id="network-main">
+                    <div class="railway-canvas">
+                        <svg class="svg-container" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet">
+                            <defs>
+                                <linearGradient id="occupiedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#ef4444;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#dc2626;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="reservedGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="freeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+                                </linearGradient>
+                            </defs>
+                            <g id="map-transform-group">
+                                <g id="tracks-group">
+                                    <!-- Tracks will be rendered here by JS -->
+                                </g>
+                                <g id="stations-and-trains-group">
+                                    <!-- Stations and Trains (in foreignObjects) will be rendered here -->
+                                </g>
+                            </g>
+                        </svg>
+                        <div id="train-details-card" class="train-detail-card"></div>
+
+                        <!-- Network Legend -->
+                        <div class="network-legend">
+                            <div style="font-weight: bold; margin-bottom: 10px; color: #3b82f6;">Track Status</div>
+                            <div class="legend-item">
+                                <div class="legend-indicator"
+                                    style="background: linear-gradient(90deg, #22c55e, #16a34a);"></div>
+                                <span>Free Track</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-indicator"
+                                    style="background: linear-gradient(90deg, #f59e0b, #d97706);"></div>
+                                <span>Reserved</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-indicator"
+                                    style="background: linear-gradient(90deg, #ef4444, #dc2626);"></div>
+                                <span>Occupied</span>
+                            </div>
+                            <div style="font-weight: bold; margin: 15px 0 10px 0; color: #3b82f6;">Train Types</div>
+                            <div class="legend-item">
+                                <div class="train-legend"
+                                    style="background: linear-gradient(135deg, #ef4444, #dc2626);"></div>
+                                <span>Express</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="train-legend"
+                                    style="background: linear-gradient(135deg, #3b82f6, #1e40af);"></div>
+                                <span>Passenger</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="train-legend"
+                                    style="background: linear-gradient(135deg, #f59e0b, #d97706);"></div>
+                                <span>Freight</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-panel-container">
+                    <!-- Network Metrics -->
+                    <div class="network-metrics">
+                        <div class="section-title">📊 Live Metrics</div>
+                        <div class="metric-card">
+                            <div class="metric-value">28</div>
+                            <div class="metric-label">Trains/Hour</div>
+                            <div class="metric-change">↗️ +18% vs Static</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" style="color: #ef4444;">2.4</div>
+                            <div class="metric-label">Avg Delay (min)</div>
+                            <div class="metric-change">↘️ -65% Reduction</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">12</div>
+                            <div class="metric-label">Conflicts Resolved</div>
+                            <div class="metric-change">✅ Auto-resolved</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">94%</div>
+                            <div class="metric-label">Track Utilization</div>
+                            <div class="metric-change">↗️ +23% Efficiency</div>
+                        </div>
+                    </div>
+
+                    <!-- AI Suggestions and Queue -->
+                    <div class="ai-suggestions-panel">
+                        <div class="section-title">🤖 AI Recommendations</div>
+                        <div id="ai-suggestions-list">
+                            <!-- AI suggestions will be dynamically inserted here -->
+                        </div>
+                        <div class="section-title" style="margin-top: 30px;">📋 Queue</div>
+                        <div class="queue-list" id="train-queue">
+                            <!-- Train queue will be dynamically inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Track Status Tab -->
+        <div class="tab-content" id="track-status">
+            <div class="track-status-container" id="track-status-container">
+                <!-- Track status cards are dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content" id="dashboard">
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="section-title">📊 Throughput Analysis</div>
+                    <div class="chart-container">
+                        <canvas id="throughputChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="section-title">⏱️ Delay Trends</div>
+                    <div class="chart-container">
+                        <canvas id="delayChart"></canvas>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="section-title">🚂 Train Status Overview</div>
+                    <div style="margin-top: 20px;">
+                        <div class="metric-card" style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #ef4444;">12951 - Rajdhani
+                                        Express</div>
+                                    <div style="font-size: 11px; color: #cbd5e1;">NDL → MUM | Priority: HIGH</div>
+                                </div>
+                                <div style="color: #f59e0b;">5min delay</div>
+                            </div>
+                        </div>
+                        <div class="metric-card" style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #3b82f6;">12003 - Shatabdi
+                                    </div>
+                                    <div style="font-size: 11px; color: #cbd5e1;">GZB → NDL | Priority: HIGH</div>
+                                </div>
+                                <div style="color: #22c55e;">On Time</div>
+                            </div>
+                        </div>
+                        <div class="metric-card" style="margin-bottom: 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #f59e0b;">67812 - Freight
+                                    </div>
+                                    <div style="font-size: 11px; color: #cbd5e1;">MRT → SBD | Priority: LOW</div>
+                                </div>
+                                <div style="color: #f59e0b;">2min delay</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <div class="section-title">⚡ System Performance</div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Tab -->
+        <div class="tab-content" id="analytics">
+            <div class="analytics-grid">
+                <div class="comparison-section">
+                    <div class="section-title">📈 Before vs After Comparison</div>
+                    <div class="before-after-cards">
+                        <div class="comparison-card">
+                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 5px;">Traditional System</div>
+                            <div class="comparison-value before-value">24</div>
+                            <div style="font-size: 10px; color: #94a3b8;">Trains per Hour</div>
+                        </div>
+                        <div class="comparison-card">
+                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 5px;">AI-Optimized</div>
+                            <div class="comparison-value after-value">28</div>
+                            <div style="font-size: 10px; color: #94a3b8;">Trains per Hour</div>
+                        </div>
+                    </div>
+                    <div class="before-after-cards">
+                        <div class="comparison-card">
+                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 5px;">Static Scheduling</div>
+                            <div class="comparison-value before-value">6.8</div>
+                            <div style="font-size: 10px; color: #94a3b8;">Avg Delay (min)</div>
+                        </div>
+                        <div class="comparison-card">
+                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 5px;">Dynamic AI</div>
+                            <div class="comparison-value after-value">2.4</div>
+                            <div style="font-size: 10px; color: #94a3b8;">Avg Delay (min)</div>
+                        </div>
+                    </div>
+                    <div class="before-after-cards">
+                        <div class="comparison-card">
+                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 5px;">Track Usage</div>
+                            <div class="comparison-value before-value">71%</div>
+                            <div style="font-size: 10px; color: #94a3b8;">Utilization</div>
+                        </div>
+                        <div class="comparison-card">
+                            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 5px;">AI Optimized</div>
+                            <div class="comparison-value after-value">94%</div>
+                            <div style="font-size: 10px; color: #94a3b8;">Utilization</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-section">
+                    <div class="section-title">🎯 ROI & Impact Analysis</div>
+                    <div style="background: #0f172a; padding: 20px; border-radius: 8px;">
+                        <div class="metric-card" style="margin-bottom: 15px;">
+                            <div class="metric-value" style="color: #22c55e;">₹2.4 Cr</div>
+                            <div class="metric-label">Annual Savings Potential</div>
+                            <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">Reduced delays & fuel costs
+                            </div>
+                        </div>
+                        <div class="metric-card" style="margin-bottom: 15px;">
+                            <div class="metric-value" style="color: #3b82f6;">45,000</div>
+                            <div class="metric-label">Additional Passengers/Day</div>
+                            <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">18% throughput increase</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value" style="color: #f59e0b;">15%</div>
+                            <div class="metric-label">Energy Reduction</div>
+                            <div style="font-size: 10px; color: #94a3b8; margin-top: 5px;">Optimized routing &
+                                scheduling</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-section">
+                    <div class="section-title">📊 Detailed Metrics</div>
+                    <div class="chart-container">
+                        <canvas id="detailedMetricsChart"></canvas>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div style="font-size: 12px; font-weight: bold; color: #3b82f6; margin-bottom: 10px;">Key
+                            Achievements:</div>
+                        <div
+                            style="background: rgba(34, 197, 94, 0.1); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #22c55e;">
+                            <div style="font-size: 11px; font-weight: bold; color: #22c55e;">Conflict Resolution: 100%
+                            </div>
+                            <div style="font-size: 10px; color: #cbd5e1;">All train conflicts automatically resolved
+                            </div>
+                        </div>
+                        <div
+                            style="background: rgba(59, 130, 246, 0.1); padding: 12px; border-radius: 6px; margin-bottom: 10px; border-left: 3px solid #3b82f6;">
+                            <div style="font-size: 11px; font-weight: bold; color: #3b82f6;">Safety Compliance: 100%
+                            </div>
+                            <div style="font-size: 10px; color: #cbd5e1;">Zero safety violations during optimization
+                            </div>
+                        </div>
+                        <div
+                            style="background: rgba(245, 158, 11, 0.1); padding: 12px; border-radius: 6px; border-left: 3px solid #f59e0b;">
+                            <div style="font-size: 11px; font-weight: bold; color: #f59e0b;">Scalability: Multi-section
+                            </div>
+                            <div style="font-size: 10px; color: #cbd5e1;">Ready for network-wide deployment</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulation Tab -->
+        <div class="tab-content" id="simulation">
+            <div style="display: grid; grid-template-columns: 300px 1fr; height: 100%; gap: 2px;">
+                <div style="background: #1e293b; padding: 20px; overflow-y: auto;">
+                    <div class="section-title">🎮 Simulation Parameters</div>
+                    <div class="control-group">
+                        <label class="input-label">Scenario Type</label>
+                        <select class="input-field">
+                            <option>Peak Hours (High Traffic)</option>
+                            <option selected>Normal Operations</option>
+                            <option>Maintenance Mode</option>
+                            <option>Emergency Scenario</option>
+                        </select>
+
+                        <label class="input-label">Number of Trains</label>
+                        <input type="range" min="5" max="20" value="10" class="input-field"
+                            oninput="this.nextElementSibling.textContent = `Current: ${this.value} trains`">
+                        <div id="trainCountDisplay" style="font-size: 12px; color: #cbd5e1;">Current: 10 trains</div>
+
+                        <label class="input-label">Simulation Duration</label>
+                        <select class="input-field">
+                            <option>1 Hour</option>
+                            <option selected>4 Hours</option>
+                            <option>8 Hours</option>
+                        </select>
+
+                        <button class="btn btn-primary" onclick="startSimulation()">🚀 Run Simulation</button>
+                        <button class="btn btn-success" onclick="runComparison()">📊 Compare with Static</button>
+                        <button class="btn btn-warning" onclick="exportResults()">💾 Export Results</button>
+                    </div>
+
+                    <div class="section-title">⚙️ AI Parameters</div>
+                    <div class="control-group">
+                        <div style="margin-bottom: 15px;">
+                            <label class="input-label">Optimization Objective</label>
+                            <div style="font-size: 11px;">
+                                <label style="display: flex; align-items: center; gap: 8px; margin: 5px 0;">
+                                    <input type="checkbox" checked> Minimize Delays
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; margin: 5px 0;">
+                                    <input type="checkbox" checked> Maximize Track Utilization
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; margin: 5px 0;">
+                                    <input type="checkbox"> Energy Efficiency
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; margin: 5px 0;">
+                                    <input type="checkbox"> Passenger Comfort
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #1e293b; display: flex; flex-direction: column;">
+                    <div style="padding: 20px; border-bottom: 1px solid #334155;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div class="section-title" style="margin: 0;">🧪 Simulation Results</div>
+                            <div id="simulationStatus"
+                                style="padding: 8px 15px; background: rgba(34, 197, 94, 0.2); border-radius: 20px; font-size: 12px; color: #22c55e;">
+                                ✅ Ready to Simulate
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; padding: 20px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; height: 100%;">
+                            <div style="background: #0f172a; padding: 20px; border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: bold; color: #3b82f6; margin-bottom: 15px;">
+                                    Live Simulation Data</div>
+                                <canvas id="simulationChart" style="width: 100%; height: 250px;"></canvas>
+                            </div>
+                            <div style="background: #0f172a; padding: 20px; border-radius: 8px;">
+                                <div style="font-size: 14px; font-weight: bold; color: #3b82f6; margin-bottom: 15px;">
+                                    Comparison Results</div>
+                                <div id="comparisonResults">
+                                    <div style="text-align: center; color: #94a3b8; margin-top: 50px; font-size: 14px;">
+                                        Click "Run Simulation" to see results
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div class="tab-content" id="settings">
+            <div class="settings-container">
+                <div class="settings-section">
+                    <div class="section-title">🏗️ System Configuration</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div>
+                            <div class="control-group">
+                                <label class="input-label">Railway Section</label>
+                                <select class="input-field">
+                                    <option selected>Delhi - Ghaziabad</option>
+                                    <option>Mumbai - Pune</option>
+                                    <option>Chennai - Bangalore</option>
+                                    <option>Kolkata - Howrah</option>
+                                </select>
+
+                                <label class="input-label">Update Frequency</label>
+                                <select class="input-field">
+                                    <option>Real-time (1 sec)</option>
+                                    <option selected>High (5 sec)</option>
+                                    <option>Medium (15 sec)</option>
+                                </select>
+
+                                <label class="input-label">Data Source</label>
+                                <select class="input-field">
+                                    <option>Kaggle Dataset</option>
+                                    <option selected>Simulated Data</option>
+                                    <option>GTFS Feed</option>
+                                    <option>Live API</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="control-group">
+                                <label class="input-label">Safety Buffer (minutes)</label>
+                                <input type="number" class="input-field" value="3" min="1" max="10">
+
+                                <label class="input-label">Max Delay Tolerance</label>
+                                <input type="number" class="input-field" value="10" min="5" max="30">
+
+                                <label class="input-label">Algorithm Type</label>
+                                <select class="input-field">
+                                    <option>Genetic Algorithm</option>
+                                    <option selected>Simulated Annealing</option>
+                                    <option>A* Search</option>
+                                    <option>Machine Learning</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <div class="section-title">🎯 Optimization Preferences</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
+                        <div>
+                            <div style="font-size: 14px; font-weight: bold; color: #cbd5e1; margin-bottom: 15px;">
+                                Priority Weights</div>
+                            <div style="margin-bottom: 15px;">
+                                <label class="input-label">Express Trains</label>
+                                <input type="range" min="1" max="10" value="9" style="width: 100%;">
+                                <div style="font-size: 11px; color: #94a3b8;">Current: High Priority (9/10)</div>
+                            </div>
+                            <div style="margin-bottom: 15px;">
+                                <label class="input-label">Passenger Trains</label>
+                                <input type="range" min="1" max="10" value="7" style="width: 100%;">
+                                <div style="font-size: 11px; color: #94a3b8;">Current: Medium Priority (7/10)</div>
+                            </div>
+                            <div>
+                                <label class="input-label">Freight Trains</label>
+                                <input type="range" min="1" max="10" value="4" style="width: 100%;">
+                                <div style="font-size: 11px; color: #94a3b8;">Current: Low Priority (4/10)</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: bold; color: #cbd5e1; margin-bottom: 15px;">
+                                Optimization Goals</div>
+                            <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <input type="checkbox" checked>
+                                <span style="font-size: 12px;">Minimize Total Delays</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <input type="checkbox" checked>
+                                <span style="font-size: 12px;">Maximize Track Utilization</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <input type="checkbox">
+                                <span style="font-size: 12px;">Energy Efficiency</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                <input type="checkbox">
+                                <span style="font-size: 12px;">Passenger Comfort</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 10px;">
+                                <input type="checkbox">
+                                <span style="font-size: 12px;">Cost Minimization</span>
+                            </label>
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: bold; color: #cbd5e1; margin-bottom: 15px;">Safety
+                                Parameters</div>
+                            <div
+                                style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #ef4444;">
+                                <div style="font-size: 12px; font-weight: bold; color: #ef4444; margin-bottom: 8px;">
+                                    Critical Safety Rules</div>
+                                <ul style="font-size: 11px; color: #cbd5e1; padding-left: 15px;">
+                                    <li>Minimum 3-minute gap between trains</li>
+                                    <li>Single occupancy per track segment</li>
+                                    <li>Emergency brake distance: 500m</li>
+                                    <li>Speed limits strictly enforced</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button class="btn btn-success" style="width: auto; padding: 12px 30px;">💾 Save Settings</button>
+                    <button class="btn btn-warning" style="width: auto; padding: 12px 30px;">🔄 Reset to
+                        Default</button>
+                    <button class="btn btn-primary" style="width: auto; padding: 12px 30px;">📤 Export
+                        Configuration</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Box for alerts -->
+    <div class="message-box" id="messageBox">
+        <h3 id="messageBoxTitle"></h3>
+        <p id="messageBoxContent"></p>
+        <button onclick="hideMessageBox()">OK</button>
+    </div>
+    <script src="station_master.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+ * {
+     margin: 0;
+     padding: 0;
+     box-sizing: border-box;
+ }
+
+ body {
+     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+     background: #0f1419;
+     color: #ffffff;
+     height: 100vh;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+ }
+
+ .login-container {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     width: 100%;
+     max-width: 500px;
+     background: #1e293b;
+     padding: 40px;
+     border-radius: 12px;
+     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+     text-align: center;
+ }
+
+ .login-container h2 {
+     font-size: 28px;
+     color: #3b82f6;
+     margin-bottom: 10px;
+     font-weight: bold;
+ }
+
+ .login-container p {
+     color: #94a3b8;
+     margin-bottom: 30px;
+ }
+
+ .login-form-wrapper {
+     display: flex;
+     flex-direction: column;
+     gap: 20px;
+     width: 100%;
+ }
+
+ .login-form {
+     display: flex;
+     flex-direction: column;
+     gap: 15px;
+     width: 100%;
+ }
+
+ .input-label {
+     display: block;
+     font-size: 12px;
+     color: #cbd5e1;
+     margin-bottom: 5px;
+     text-align: left;
+ }
+
+ .input-field {
+     width: 100%;
+     padding: 12px;
+     background: #0f172a;
+     border: 1px solid #334155;
+     border-radius: 5px;
+     color: #ffffff;
+     font-size: 14px;
+     margin-bottom: 5px;
+ }
+
+ .btn {
+     width: 100%;
+     padding: 12px 15px;
+     border: none;
+     border-radius: 5px;
+     font-size: 14px;
+     font-weight: bold;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     margin-bottom: 10px;
+ }
+
+ .btn-primary {
+     background: #3b82f6;
+     color: white;
+ }
+
+ .btn-warning {
+     background: #f59e0b;
+     color: white;
+ }
+
+ .btn:hover {
+     transform: translateY(-2px);
+     filter: brightness(1.1);
+ }
+
+ .message-box {
+     position: fixed;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     background: #1e293b;
+     border: 1px solid #3b82f6;
+     border-radius: 12px;
+     padding: 30px;
+     box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+     z-index: 2000;
+     display: none;
+     flex-direction: column;
+     align-items: center;
+     max-width: 400px;
+     text-align: center;
+ }
+
+ .message-box h3 {
+     font-size: 18px;
+     margin-bottom: 15px;
+     color: #3b82f6;
+ }
+
+ .message-box p {
+     font-size: 14px;
+     color: #cbd5e1;
+     margin-bottom: 20px;
+     line-height: 1.5;
+ }
+
+ .message-box button {
+     background: #3b82f6;
+     color: white;
+     border: none;
+     padding: 10px 20px;
+     border-radius: 8px;
+     cursor: pointer;
+     font-weight: bold;
+     transition: background-color 0.3s ease;
+ }
+
+ .message-box button:hover {
+     background: #2563eb;
+ }

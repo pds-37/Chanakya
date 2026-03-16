@@ -1,0 +1,861 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f1419;
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.app-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #3b82f6;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #60a5fa;
+}
+
+.project-info {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+.status-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border-radius: 20px;
+    background: rgba(34, 197, 94, 0.2);
+    border: 1px solid #22c55e;
+    /* Added glow effect for 'Active' status */
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    animation: pulse 2s infinite;
+}
+
+.logout-btn {
+    background: #dc2626;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background: #b91c1c;
+}
+
+/* Tab Navigation */
+.tab-navigation {
+    background: #1e293b;
+    padding: 0;
+    border-bottom: 2px solid #334155;
+    overflow-x: auto;
+}
+
+.tab-list {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.tab-item {
+    background: transparent;
+    border: none;
+    padding: 15px 25px;
+    color: #94a3b8;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.tab-item:hover {
+    color: #e2e8f0;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.tab-item.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* Tab Content */
+.tab-content {
+    flex: 1;
+    display: none;
+    overflow: hidden;
+}
+
+#network {
+    padding: 0px;
+}
+
+.tab-content#track-status,
+.tab-content#analytics,
+.tab-content#simulation,
+.tab-content#settings {
+    overflow-y: auto;
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Network Visualization Tab */
+.network-tab {
+    display: grid;
+    grid-template-areas:
+        "controls main-view right-panel"
+        "controls main-view right-panel";
+    grid-template-columns: 340px 1fr 35%; /* <-- INCREASED FOR A WIDER LEFT PANEL */
+    grid-template-rows: 1fr;
+    gap: 30px;
+    height: 100%;
+    width: 100%;
+}
+
+
+.network-controls {
+    grid-area: controls;
+    background: #1e293b;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.network-main {
+    grid-area: main-view;
+    background: #0f172a;
+    position: relative;
+    border: 1px solid #334155;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+}
+
+.network-main:active {
+    cursor: grabbing;
+}
+
+.railway-canvas {
+    position: relative;
+    width: 100%;
+    height: 80%;
+}
+
+.right-panel-container {
+ grid-area: right-panel;
+ display: flex;
+ flex-direction: column;
+ justify-content: center; /* This is the key change to vertically center the content */
+ gap: 15px; /* Increased gap for better spacing */
+ max-height: 100%;
+ overflow: hidden;
+}
+.network-metrics {
+    background: #1e293b;
+    padding: 20px;
+    overflow-y: auto;
+    flex-shrink: 1;
+}
+
+.ai-suggestions-panel {
+    background: #1e293b;
+    padding: 20px;
+    overflow-y: auto;
+    flex-shrink: 1;
+}
+
+/* Railway Network Visualization */
+.svg-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+path.invisible-path {
+    visibility: hidden;
+}
+
+/* Better Station Design */
+.station {
+    width: 80px;
+    height: 40px;
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    border: 2px solid #60a5fa;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    z-index: 10;
+    padding: 4px;
+}
+
+.station:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 25px rgba(59, 130, 246, 0.5);
+}
+
+.station-code {
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.station-name {
+    font-size: 8px;
+    color: #cbd5e1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Better Track Design (SVG paths) */
+.track-sleeper {
+    stroke: #4a5568;
+    stroke-width: 5;
+}
+
+.track-rail {
+    stroke-width: 2;
+    fill: none;
+    transition: stroke 0.5s ease;
+}
+
+/* Better Train Design */
+.train {
+    width: 40px;
+    height: 20px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.1s linear;
+    z-index: 100;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.train.held {
+    animation: flash 1s infinite;
+}
+
+@keyframes flash {
+
+    0%,
+    100% {
+        filter: brightness(1);
+    }
+
+    50% {
+        filter: brightness(1.5);
+    }
+}
+
+.train::before {
+    content: '';
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    top: 2px;
+    left: 3px;
+}
+
+.train-express {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+}
+
+.train-passenger {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+}
+
+.train-freight {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+}
+
+/* Component Styles */
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #3b82f6;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 8px;
+}
+
+.control-group {
+    margin-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-bottom: 5px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 8px 12px;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+/* New rule to increase font size for priority labels */
+.network-controls .control-group div[style*="font-size: 11px"] {
+    font-size: 13px !important;
+}
+
+.btn {
+    width: 100%;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-success {
+    background: #22c55e;
+    color: white;
+}
+
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.metric-card {
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid #3b82f6;
+}
+
+.metric-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #22c55e;
+}
+
+.metric-label {
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-top: 5px;
+}
+
+.metric-change {
+    font-size: 13px;
+    color: #22c55e;
+    margin-top: 3px;
+}
+
+.ai-suggestion {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid #22c55e;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+}
+
+.queue-item {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.queue-item .title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.queue-item .details {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.queue-item .status {
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.queue-item .status.on-time {
+    color: #22c55e;
+}
+
+.queue-item .status.delayed {
+    color: #f59e0b;
+}
+
+.suggestion-header {
+    font-weight: bold;
+    color: #22c55e;
+    margin-bottom: 5px;
+}
+
+.suggestion-action {
+    background: #22c55e;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+/* Dashboard Tab Styles */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.dashboard-card {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #334155;
+}
+
+.chart-container {
+    height: 300px;
+    margin-top: 15px;
+}
+
+/* Analytics Tab */
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.comparison-section {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #334155;
+}
+
+.before-after-cards {
+    display: flex;
+    gap: 15px;
+    margin: 15px 0;
+}
+
+.comparison-card {
+    flex: 1;
+    background: #0f172a;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.comparison-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.before-value {
+    color: #ef4444;
+}
+
+.after-value {
+    color: #22c55e;
+}
+
+/* Settings Tab */
+.settings-container {
+    padding: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.settings-section {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #334155;
+}
+
+/* Track Status Tab */
+.track-status-container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    overflow-y: auto;
+}
+
+.track-status-card {
+    background: #1e293b;
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border: 1px solid #334155;
+}
+
+.status-dot-lg {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+}
+
+.status-dot-lg.free {
+    background: #22c55e;
+}
+
+.status-dot-lg.reserved {
+    background: #f59e0b;
+}
+
+.status-dot-lg.occupied {
+    background: #ef4444;
+}
+
+.track-details {
+    flex: 1;
+    font-size: 16px;
+    /* Bigger font */
+}
+
+.track-info-label {
+    font-size: 12px;
+    /* Bigger font */
+    color: #94a3b8;
+}
+
+.track-status-text {
+    font-weight: bold;
+    font-size: 15px;
+    /* Bigger font */
+}
+
+.free-text {
+    color: #22c55e;
+}
+
+.reserved-text {
+    color: #f59e0b;
+}
+
+.occupied-text {
+    color: #ef4444;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.train-detail-card {
+    position: absolute;
+    background: #1e293b;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    padding: 15px;
+    color: #cbd5e1;
+    z-index: 1000;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    width: 250px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    font-size: 12px;
+    line-height: 1.4;
+    pointer-events: none;
+    /* Allows clicks to pass through */
+}
+
+.train-detail-card .title {
+    font-weight: bold;
+    color: #3b82f6;
+    font-size: 14px;
+    border-bottom: 1px solid #334155;
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+}
+
+.train-detail-card .info-line {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Custom Message Box Styles */
+.message-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1e293b;
+    border: 1px solid #3b82f6;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    text-align: center;
+}
+
+.message-box h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #3b82f6;
+}
+
+.message-box p {
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.message-box button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.message-box button:hover {
+    background: #2563eb;
+}
+
+.network-legend {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 15px;
+    color: #cbd5e1;
+    font-size: 11px;
+    z-index: 50;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.legend-indicator {
+    width: 30px;
+    height: 6px;
+    border-radius: 3px;
+}
+
+.train-legend {
+    width: 20px;
+    height: 10px;
+    border-radius: 3px;
+}
+
+/* New styles for Loco Pilot Updates panel */
+.lp-update-container {
+    background: #0f172a;
+    border-radius: 8px;
+    padding: 15px;
+    height: 250px; /* Adjust height as needed */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lp-update-placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.lp-update-item {
+    background: #1e293b;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    border-left: 4px solid #3b82f6;
+}
+
+.lp-update-item.emergency {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    font-weight: bold;
+    animation: pulse-red 1s infinite;
+}
+
+.lp-update-item .timestamp {
+    display: block;
+    font-size: 10px;
+    color: #94a3b8;
+    margin-top: 5px;
+}
+
+/* Flashing effect for the train on the map */
+.train.emergency-stop {
+    animation: flash-red 0.5s infinite;
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
+    50% { box-shadow: 0 0 15px rgba(239, 68, 68, 1); }
+    100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.5); }
+}
+
+@keyframes flash-red {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(2) drop-shadow(0 0 5px #ef4444); }
+}
+
+.suggestion-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.suggestion-buttons button {
+    flex: 1;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.suggestion-buttons button:hover {
+    transform: scale(1.05);
+}
+
+.btn-yes {
+    background: #22c55e;
+}
+
+.btn-no {
+    background: #ef4444;
+}

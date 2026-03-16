@@ -1,0 +1,437 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f1419;
+    color: #ffffff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.app-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #3b82f6;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #60a5fa;
+}
+
+.project-info {
+    font-size: 14px;
+    color: #cbd5e1;
+}
+
+.logout-btn {
+    background: #dc2626;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.logout-btn:hover {
+    background: #b91c1c;
+}
+
+.notification-card {
+    position: absolute;
+    top: 80px;
+    right: 20px;
+    background: #f59e0b;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    z-index: 100;
+    display: none;
+    max-width: 300px;
+    animation: fadeIn 0.5s, fadeOut 0.5s 4.5s forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.locopilot-dashboard-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr;
+    gap: 20px;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.lp-panel {
+    background: #1e293b;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #334155;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.lp-content-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 20px;
+    padding: 20px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #3b82f6;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #334155;
+    padding-bottom: 8px;
+}
+
+.locopilot-card {
+    background: #0f172a;
+    border-radius: 12px;
+    padding: 30px;
+    width: 100%;
+    max-width: 600px;
+    border: 1px solid #3b82f6;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2);
+    text-align: center;
+    margin: 0 auto;
+}
+
+.locopilot-card .title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #60a5fa;
+    margin-bottom: 15px;
+}
+
+.locopilot-card .info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    padding: 10px 0;
+    border-bottom: 1px solid #334155;
+}
+
+.locopilot-card .info-row:last-child {
+    border-bottom: none;
+}
+
+.locopilot-card .info-label {
+    color: #94a3b8;
+}
+
+.locopilot-card .info-value {
+    font-weight: bold;
+}
+
+.locopilot-status {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px auto 0;
+    max-width: 600px;
+}
+
+.locopilot-status.on-time {
+    background: rgba(34, 197, 94, 0.1);
+    color: #22c55e;
+    border: 1px solid #22c55e;
+}
+
+.locopilot-status.delayed {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+}
+
+.btn-danger {
+    background: #ef4444;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.btn-danger:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.message-box {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1e293b;
+    border: 1px solid #3b82f6;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 8px 30px rgba(59, 130, 246, 0.5);
+    z-index: 2000;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    max-width: 400px;
+    text-align: center;
+}
+
+.message-box h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: #3b82f6;
+}
+
+.message-box p {
+    font-size: 14px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.message-box button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.message-box button:hover {
+    background: #2563eb;
+}
+
+.map-section {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #0f172a;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-top-bar {
+    padding: 10px;
+    background: #0f172a;
+    border-bottom: 1px solid #334155;
+    font-size: 12px;
+    color: #94a3b8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.map-list {
+    list-style: none;
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.map-list li {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    background: #0f172a;
+    border-radius: 6px;
+    border: 1px solid #334155;
+    transition: border-left 0.3s;
+}
+
+.map-list li.current {
+    border-left: 3px solid #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.map-list .station-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.map-list .station-code {
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+}
+
+.map-list .station-name {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.map-list .station-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 11px;
+}
+
+.map-list .arrival-time,
+.map-list .status {
+    font-weight: bold;
+}
+
+.map-list .status.on-time {
+    color: #22c55e;
+}
+
+.map-list .status.delayed {
+    color: #f59e0b;
+}
+
+.updates-log {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 10px;
+}
+
+.update-item {
+    background: #0f172a;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #22c55e;
+    font-size: 12px;
+    position: relative;
+}
+
+.update-item.critical {
+    border-left-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.update-item .timestamp {
+    font-size: 10px;
+    color: #94a3b8;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Style for the new speed advisory */
+.advisory-speed {
+    color: #f59e0b; /* Amber color for warnings/advisories */
+    font-weight: bold;
+}
+
+.btn-success {
+    background: #22c55e;
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
+
+.btn-success:disabled {
+    background: #4a5568;
+    color: #a0aec0;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+}

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loco Pilot Dashboard</title>
+    <link rel="stylesheet" href="loco_pilot.css">
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo-section">
+                <div class="logo">🚄 AI Railway Traffic Control</div>
+                <div class="project-info">
+                    <div style="font-weight: bold;">Loco Pilot Dashboard</div>
+                </div>
+            </div>
+            <div class="status-section">
+                <div>Real-time: <span id="current-time"></span></div>
+                <button class="logout-btn" onclick="handleLogout()">Logout</button>
+            </div>
+        </div>
+
+        <div id="notification-card" class="notification-card"></div>
+
+        <div class="locopilot-dashboard-container">
+            <div class="lp-panel">
+                <h2 class="section-title">Live Map</h2>
+                <div class="map-section">
+                    <div class="map-top-bar">
+                        <span id="map-date"></span>
+                        <button
+                            style="background: #3b82f6; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; font-size: 10px;">Show
+                            on Bhuvan Map</button>
+                    </div>
+                    <ul class="map-list" id="map-station-list">
+                        <!-- Map stations will be rendered here -->
+                    </ul>
+                </div>
+            </div>
+            <div class="lp-content-center">
+                <div class="loco-card-container">
+                    <h2 class="section-title">Your Train Status</h2>
+                    <div class="locopilot-card">
+                        <div class="title" id="lp-train-title"></div>
+                        <div class="info-row">
+                            <span class="info-label">Current Route:</span>
+                            <span class="info-value" id="lp-train-route"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Next Station:</span>
+                            <span class="info-value" id="lp-next-station"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">ETA:</span>
+                            <span class="info-value" id="lp-eta"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Delay:</span>
+                            <span class="info-value" id="lp-delay"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">AI Speed Advisory:</span>
+                            <span class="info-value advisory-speed" id="lp-speed-advisory">--</span>
+                        </div>
+                    </div>
+                    <div class="locopilot-status on-time" id="lp-status-indicator">All Clear</div>
+                    <button class="btn-danger" onclick="triggerEmergencyStop()">🚨 Emergency Stop</button>
+                    <button class="btn-success" id="resume-button" onclick="requestResume()" disabled>🟢 Resume Journey</button>
+                </div>
+            </div>
+            <div class="lp-panel">
+                <h2 class="section-title">Updates from Control</h2>
+                <div class="updates-log" id="updates-log">
+                    <!-- Updates will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="message-box" id="messageBox">
+        <h3 id="messageBoxTitle"></h3>
+        <p id="messageBoxContent"></p>
+        <button onclick="hideMessageBox()">OK</button>
+    </div>
+
+    <script src="loco_pilot.js"></script>
+</body>
+
+</html>
